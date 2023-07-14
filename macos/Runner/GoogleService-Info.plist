@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>375479802564-b2csmmino2gll0qhhei9letm96klr3cr.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.375479802564-b2csmmino2gll0qhhei9letm96klr3cr</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>375479802564-l2mj2b0a7dn4f02qdcs7lsf6pafm0cub.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDzF0tv_a4ElNXFgx-yr_4fsrA8a4OaN6c</string>
+	<key>GCM_SENDER_ID</key>
+	<string>375479802564</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.googlecloudstoragedemo</string>
+	<key>PROJECT_ID</key>
+	<string>cloudstoragedemo-a7555</string>
+	<key>STORAGE_BUCKET</key>
+	<string>cloudstoragedemo-a7555.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:375479802564:ios:8ad56b764ca6d26db90791</string>
+	<key>DATABASE_URL</key>
+	<string>https://cloudstoragedemo-a7555-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
