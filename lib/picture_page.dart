@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ class PicturePage extends StatefulWidget {
 class _PicturePageState extends State<PicturePage> {
   String imageUrl = '';
   bool startLoad = false;
+  double progress = 0.0;
 
   @override
   void initState() {
@@ -96,9 +98,18 @@ class _PicturePageState extends State<PicturePage> {
                 child: startLoad
                     ? const CircularProgressIndicator()
                     : imageUrl.isNotEmpty
-                        ? Image.network(
-                            imageUrl,
-                            gaplessPlayback: true,
+                        ? CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            // placeholder: (BuildContext context, String url) {
+                            //   return const CircularProgressIndicator(
+                            //   );
+                            // },
+                            progressIndicatorBuilder: (BuildContext context, String url, DownloadProgress progress) {
+                              return const CircularProgressIndicator();
+                            },
+                            errorWidget: (BuildContext context, String url, dynamic error) {
+                              return const Text('加载失败');
+                            },
                           )
                         : const SizedBox(),
               ),

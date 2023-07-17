@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:googlecloudstoragedemo/bucket_list_page.dart';
 import 'package:googlecloudstoragedemo/firebase_options.dart';
 import 'package:googlecloudstoragedemo/login_page.dart';
@@ -25,7 +25,7 @@ Future<void> main() async {
     // 1. Debug provider
     // 2. Safety Net provider
     // 3. Play Integrity provider
-    androidProvider: AndroidProvider.playIntegrity,
+    androidProvider: AndroidProvider.debug,
   );
   runApp(const MyApp());
 }
@@ -93,11 +93,16 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 const Text('\n------------上传------------\n'),
                 showUploadProgress
-                    ? LinearProgressIndicator(
-                        minHeight: 10,
-                        backgroundColor: Colors.blue,
-                        value: uploadProgressValue,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.yellow),
+                    ? Column(
+                        children: [
+                          LinearProgressIndicator(
+                            minHeight: 10,
+                            backgroundColor: Colors.blue,
+                            value: uploadProgressValue,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.yellow),
+                          ),
+                          Text('${(uploadProgressValue * 100).toInt()}%'),
+                        ],
                       )
                     : const SizedBox(),
                 Row(
@@ -105,18 +110,28 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          showUploadProgress = true;
-                        });
-                        final storageRef = FirebaseStorage.instance.ref('Images');
-                        final imagesRef = storageRef.child('abc.webp');
-
                         Directory? appFilesDir = await getExternalStorageDirectory();
                         print('macy777 --appFilesDir-> ${appFilesDir?.absolute.path}');
                         String filePath = '${appFilesDir?.absolute.path}/test3.webp';
                         File file = File(filePath);
                         if (file.existsSync()) {
-                          putFileToFBStorage(imagesRef, file);
+                          final storageRef = FirebaseStorage.instance.ref('Images');
+                          final imagesRef = storageRef.child('abc.webp');
+                          myUploadTask = imagesRef.putFile(file);
+                          uploadFile(myUploadTask);
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "上传的文件不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                          setState(() {
+                            uploadProgressValue = 0.0;
+                            showUploadProgress = false;
+                          });
                         }
                       },
                       child: const Text('上传图片'),
@@ -124,17 +139,27 @@ class _MyHomePageState extends State<MyHomePage> {
                     const SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          showUploadProgress = true;
-                        });
-                        final storageRef = FirebaseStorage.instance.ref('Videos');
-                        final videosRef = storageRef.child('video.mp4');
-
                         Directory? appFilesDir = await getExternalStorageDirectory();
                         String filePath = '${appFilesDir?.absolute.path}/video.mp4';
                         File file = File(filePath);
                         if (file.existsSync()) {
-                          putFileToFBStorage(videosRef, file);
+                          final storageRef = FirebaseStorage.instance.ref('Videos');
+                          final videosRef = storageRef.child('video.mp4');
+                          myUploadTask = videosRef.putFile(file);
+                          uploadFile(myUploadTask);
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "上传的文件不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                          setState(() {
+                            uploadProgressValue = 0.0;
+                            showUploadProgress = false;
+                          });
                         }
                       },
                       child: const Text('上传视频'),
@@ -142,17 +167,27 @@ class _MyHomePageState extends State<MyHomePage> {
                     const SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          showUploadProgress = true;
-                        });
-                        final storageRef = FirebaseStorage.instance.ref('Docs');
-                        final docsRef = storageRef.child('abc.pdf');
-
                         Directory? appFilesDir = await getExternalStorageDirectory();
                         String filePath = '${appFilesDir?.absolute.path}/pdf_test.pdf';
                         File file = File(filePath);
                         if (file.existsSync()) {
-                          putFileToFBStorage(docsRef, file);
+                          final storageRef = FirebaseStorage.instance.ref('Docs');
+                          final docsRef = storageRef.child('abc.pdf');
+                          myUploadTask = docsRef.putFile(file);
+                          uploadFile(myUploadTask);
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "上传的文件不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                          setState(() {
+                            uploadProgressValue = 0.0;
+                            showUploadProgress = false;
+                          });
                         }
                       },
                       child: const Text('上传文档'),
@@ -165,45 +200,46 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                       onPressed: () async {
                         setState(() {
+                          uploadProgressValue = 0.0;
                           showUploadProgress = true;
                         });
                         final storageRef = FirebaseStorage.instance.ref('Docs');
                         final textRef = storageRef.child('text');
 
                         String dataUrl = 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==';
-
-                        try {
-                          await textRef.putString(dataUrl, format: PutStringFormat.dataUrl);
-                          setState(() {
-                            showUploadProgress = false;
-                          });
-                        } on FirebaseException catch (e) {
-                          print('macy777 上传字符串---exception---  $e');
-                        }
+                        myUploadTask = textRef.putString(dataUrl, format: PutStringFormat.dataUrl);
+                        uploadFile(myUploadTask);
                       },
                       child: const Text('上传字符串'),
                     ),
                     const SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          showUploadProgress = true;
-                        });
-                        final storageRef = FirebaseStorage.instance.ref('Images');
-                        final imagesRef = storageRef.child('originData');
-
                         Directory? appDocDir = await getExternalStorageDirectory();
                         String filePath = '${appDocDir?.absolute.path}/test1.jpg';
                         File file = File(filePath);
                         if (file.existsSync()) {
-                          try {
-                            await imagesRef.putData(file.readAsBytesSync());
-                            setState(() {
-                              showUploadProgress = false;
-                            });
-                          } on FirebaseException catch (e) {
-                            print('macy777 上传原始数据---exception---  $e');
-                          }
+                          setState(() {
+                            uploadProgressValue = 0.0;
+                            showUploadProgress = true;
+                          });
+                          final storageRef = FirebaseStorage.instance.ref('Images');
+                          final imagesRef = storageRef.child('originData');
+                          myUploadTask = imagesRef.putData(file.readAsBytesSync());
+                          uploadFile(myUploadTask);
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "上传的文件不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                          setState(() {
+                            uploadProgressValue = 0.0;
+                            showUploadProgress = false;
+                          });
                         }
                       },
                       child: const Text('上传原始数据'),
@@ -242,11 +278,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const Text('\n------------下载------------\n'),
                 showDownloadProgress
-                    ? LinearProgressIndicator(
-                        minHeight: 10,
-                        backgroundColor: Colors.green,
-                        value: downloadProgressValue,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+                    ? Column(
+                        children: [
+                          LinearProgressIndicator(
+                            minHeight: 10,
+                            backgroundColor: Colors.green,
+                            value: downloadProgressValue,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+                          ),
+                          Text('${(downloadProgressValue * 100).toInt()}%'),
+                        ],
                       )
                     : const SizedBox(),
                 Row(
@@ -254,67 +295,70 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          showDownloadProgress = true;
-                        });
-                        final storageRef = FirebaseStorage.instance.ref('Images');
-                        final imagesRef = storageRef.child('abc.webp');
-
                         var appDownloadDir = await getDownloadDir();
                         if (appDownloadDir == null) {
-                          setState(() {
-                            showDownloadProgress = false;
-                          });
+                          Fluttertoast.showToast(
+                              msg: "下载到的文件夹不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
                           return;
                         }
                         String filePath = '${appDownloadDir.absolute.path}/test3.webp';
-                        print('macy777 --download-- > $filePath');
                         File file = File(filePath);
-                        downLoadFileFromFBStorage(imagesRef, file);
+                        print('macy777 --download-- > $filePath');
+                        final storageRef = FirebaseStorage.instance.ref('Images');
+                        final imagesRef = storageRef.child('abc.webp');
+                        downLoadFile(imagesRef, file);
                       },
                       child: const Text('下载图片'),
                     ),
                     const SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          showDownloadProgress = true;
-                        });
-                        final storageRef = FirebaseStorage.instance.ref('Videos');
-                        final videosRef = storageRef.child('video.mp4');
-
                         var appDownloadDir = await getDownloadDir();
                         if (appDownloadDir == null) {
-                          setState(() {
-                            showDownloadProgress = false;
-                          });
+                          Fluttertoast.showToast(
+                              msg: "下载到的文件夹不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
                           return;
                         }
                         String filePath = '${appDownloadDir.absolute.path}/video.mp4';
                         File file = File(filePath);
-                        downLoadFileFromFBStorage(videosRef, file);
+                        final storageRef = FirebaseStorage.instance.ref('Videos');
+                        final videosRef = storageRef.child('video.mp4');
+                        downLoadFile(videosRef, file);
                       },
                       child: const Text('下载视频'),
                     ),
                     const SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          showDownloadProgress = true;
-                        });
-                        final storageRef = FirebaseStorage.instance.ref('Docs');
-                        final docsRef = storageRef.child('abc.pdf');
-
                         var appDownloadDir = await getDownloadDir();
                         if (appDownloadDir == null) {
-                          setState(() {
-                            showDownloadProgress = false;
-                          });
+                          Fluttertoast.showToast(
+                              msg: "下载到的文件夹不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
                           return;
                         }
                         String filePath = '${appDownloadDir.absolute.path}/pdf_test.pdf';
                         File file = File(filePath);
-                        downLoadFileFromFBStorage(docsRef, file);
+                        final storageRef = FirebaseStorage.instance.ref('Docs');
+                        final docsRef = storageRef.child('abc.pdf');
+                        downLoadFile(docsRef, file);
                       },
                       child: const Text('下载文档'),
                     ),
@@ -326,6 +370,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                       onPressed: () async {
                         setState(() {
+                          downloadProgressValue = 0.0;
                           showDownloadProgress = true;
                         });
                         final storageRef = FirebaseStorage.instance.ref('Docs');
@@ -333,35 +378,41 @@ class _MyHomePageState extends State<MyHomePage> {
 
                         var appDownloadDir = await getDownloadDir();
                         if (appDownloadDir == null) {
-                          setState(() {
-                            showDownloadProgress = false;
-                          });
+                          Fluttertoast.showToast(
+                              msg: "下载到的文件夹不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
                           return;
                         }
                         String filePath = '${appDownloadDir.absolute.path}/text.txt';
                         File file = File(filePath);
-                        downLoadFileFromFBStorage(textRef, file);
+                        downLoadFile(textRef, file);
                       },
                       child: const Text('下载字符串'),
                     ),
                     const SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          showDownloadProgress = true;
-                        });
-                        final imagesRef = FirebaseStorage.instance.ref('Images/originData');
-
                         var appDownloadDir = await getDownloadDir();
                         if (appDownloadDir == null) {
-                          setState(() {
-                            showDownloadProgress = false;
-                          });
+                          Fluttertoast.showToast(
+                              msg: "下载到的文件夹不存在",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
                           return;
                         }
                         String filePath = '${appDownloadDir.absolute.path}/test1.jpg';
                         File file = File(filePath);
-                        downLoadFileFromFBStorage(imagesRef, file);
+                        final imagesRef = FirebaseStorage.instance.ref('Images/originData');
+                        downLoadFile(imagesRef, file);
                       },
                       child: const Text('下载原始数据'),
                     ),
@@ -615,10 +666,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  ///上传文件
-  void putFileToFBStorage(Reference bucketReference, File file) {
+  ///将本地文件上传到Firebase Cloud Storage
+  void uploadFile(UploadTask? myUploadTask) {
     try {
-      myUploadTask = bucketReference.putFile(file);
+      setState(() {
+        uploadProgressValue = 0.0;
+        showUploadProgress = true;
+      });
       myUploadTask?.snapshotEvents.listen((taskSnapshot) {
         switch (taskSnapshot.state) {
           case TaskState.running:
@@ -633,8 +687,9 @@ class _MyHomePageState extends State<MyHomePage> {
             break;
           case TaskState.success:
             print("macy777 ----Upload was succeed");
-            setState(() {
+            Future.delayed(const Duration(milliseconds: 500), () {
               showUploadProgress = false;
+              setState(() {});
             });
             break;
           case TaskState.canceled:
@@ -650,8 +705,16 @@ class _MyHomePageState extends State<MyHomePage> {
             });
             break;
         }
+      }).onError((handleError) {
+        setState(() {
+          showUploadProgress = false;
+        });
+        print('macy777 ----上传文件---handleError---  $handleError');
       });
     } on FirebaseException catch (e) {
+      setState(() {
+        showUploadProgress = false;
+      });
       print('macy777 ----上传文件---exception---  $e');
     }
   }
@@ -659,16 +722,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<Directory?> getDownloadDir() async {
     Directory? appFilesDir = await getExternalStorageDirectory();
     if (appFilesDir == null) {
-      setState(() {
-        showDownloadProgress = false;
-      });
       return null;
     }
     var lastIndexOf = appFilesDir.absolute.path.lastIndexOf('/');
     if (lastIndexOf == -1) {
-      setState(() {
-        showDownloadProgress = false;
-      });
       return null;
     }
     String appDownloadDirPath = appFilesDir.absolute.path.substring(0, lastIndexOf);
@@ -679,9 +736,13 @@ class _MyHomePageState extends State<MyHomePage> {
     return appDownloadDir;
   }
 
-  ///下载文件到本地存储
-  void downLoadFileFromFBStorage(Reference bucketReference, File file) {
+  ///从Firebase Cloud Storage下载文件到本地存储
+  void downLoadFile(Reference bucketReference, File file) {
     try {
+      setState(() {
+        downloadProgressValue = 0.0;
+        showDownloadProgress = true;
+      });
       myDownloadTask = bucketReference.writeToFile(file);
       myDownloadTask?.snapshotEvents.listen((taskSnapshot) {
         switch (taskSnapshot.state) {
@@ -697,8 +758,9 @@ class _MyHomePageState extends State<MyHomePage> {
             break;
           case TaskState.success:
             print("macy777 ----Download was succeed");
-            setState(() {
+            Future.delayed(const Duration(milliseconds: 500), () {
               showDownloadProgress = false;
+              setState(() {});
             });
             break;
           case TaskState.canceled:
@@ -714,8 +776,16 @@ class _MyHomePageState extends State<MyHomePage> {
             });
             break;
         }
+      }).onError((handlerError) {
+        setState(() {
+          showDownloadProgress = false;
+        });
+        print('macy777 ----下载文件---handlerError---  $handlerError');
       });
     } on FirebaseException catch (e) {
+      setState(() {
+        showDownloadProgress = false;
+      });
       print('macy777 ----下载文件---exception---  $e');
     }
   }
