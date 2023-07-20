@@ -5,10 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:googlecloudstoragedemo/bucket_list_page.dart';
 import 'package:googlecloudstoragedemo/firebase_options.dart';
-import 'package:googlecloudstoragedemo/login_page.dart';
-import 'package:googlecloudstoragedemo/picture_page.dart';
+import 'package:googlecloudstoragedemo/module/bucket_list_page.dart';
+import 'package:googlecloudstoragedemo/module/login_page.dart';
+import 'package:googlecloudstoragedemo/module/picture_page.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
@@ -118,6 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           final storageRef = FirebaseStorage.instance.ref('Images');
                           final imagesRef = storageRef.child('abc.webp');
                           myUploadTask = imagesRef.putFile(file);
+                          // myUploadTask = imagesRef.putString(base64Encode(file.readAsBytesSync()),
+                          //         format: PutStringFormat.base64);
+                          // myUploadTask = imagesRef.putData(file.readAsBytesSync());
                           uploadFile(myUploadTask);
                         } else {
                           Fluttertoast.showToast(
