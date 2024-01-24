@@ -1,4 +1,4 @@
-# googlecloudstoragedemo
+# Google Cloud Storage Demo
 
 A new Flutter project.
 
